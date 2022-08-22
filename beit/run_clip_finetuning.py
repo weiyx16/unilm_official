@@ -204,7 +204,7 @@ def get_args():
     parser.add_argument('--enable_deepspeed', action='store_true', default=False)
 
     # job tag
-    parser.add_argument('--tag', action='store_true', default=False)
+    parser.add_argument('--tag', type=str, default='clip_ft')
 
     known_args, _ = parser.parse_known_args()
 
