@@ -55,6 +55,32 @@ class LayerDecayValueAssigner(object):
         return get_num_layer_for_vit(var_name, len(self.values))
 
 
+def get_num_layer_for_clip(name, num_layers):
+    if name in ("class_embedding", "positional_embedding"):
+        return 0
+    elif name.startswith("conv1"):
+        return 0
+    elif name.startswith("ln_pre"):
+        return 0
+    elif name.startswith("transformer"):
+        layer_id = int(name.split('.')[2])
+        return layer_id + 1
+    else:
+        return num_layers - 1
+
+
+
+class CLIPLayerDecayValueAssigner(object):
+    def __init__(self, values):
+        self.values = values
+
+    def get_scale(self, layer_id):
+        return self.values[layer_id]
+
+    def get_layer_id(self, var_name):
+        return get_num_layer_for_clip(var_name, len(self.values))
+
+
 def get_parameter_groups(model, weight_decay=1e-5, skip_list=(), get_num_layer=None, get_layer_scale=None):
     parameter_group_names = {}
     parameter_group_vars = {}
