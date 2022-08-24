@@ -109,11 +109,12 @@ class Transformer(nn.Module):
 
 
 class VisionTransformer(nn.Module):
-    def __init__(self, input_resolution: int, patch_size: int, width: int, layers: int, heads: int, num_classes: int, drop_path_rate=0.0, init_values=None):
+    def __init__(self, input_resolution: int, patch_size: int, width: int, layers: int, heads: int, num_classes: int, drop_path_rate=0.0, init_values=None, use_mean_pooling=False):
         super().__init__()
         self.input_resolution = input_resolution
         self.patch_size = patch_size
         self.num_classes = num_classes
+        self.use_mean_pooling = use_mean_pooling
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=width, kernel_size=patch_size, stride=patch_size, bias=False)
 
         self.width = width
@@ -159,7 +160,10 @@ class VisionTransformer(nn.Module):
 
     def forward(self, x: torch.Tensor):
         x = self.forward_featuremap(x)
-        x = self.ln_post(x[:, 0, :])
+        if self.use_mean_pooling:
+            x = self.ln_post(x[:, 1:, :].mean(1))
+        else:
+            x = self.ln_post(x[:, 0, :])
 
         if self.head is not None:
             x = x @ self.head

@@ -149,7 +149,7 @@ def get_args():
     parser.add_argument('--model_prefix', default='', type=str)
     parser.add_argument('--init_scale', default=0.001, type=float)
     parser.add_argument('--use_mean_pooling', action='store_true')
-    parser.set_defaults(use_mean_pooling=True)
+    parser.set_defaults(use_mean_pooling=False)
     parser.add_argument('--use_cls', action='store_false', dest='use_mean_pooling')
     parser.add_argument('--disable_weight_decay_on_rel_pos_bias', action='store_true', default=False)
 
@@ -317,7 +317,7 @@ def main(args, ds_init):
         pretrained=False,
         num_classes=args.nb_classes,
         drop_path_rate=args.drop_path,
-        # use_mean_pooling=args.use_mean_pooling,
+        use_mean_pooling=args.use_mean_pooling,
         # init_scale=args.init_scale,
         # use_rel_pos_bias=args.rel_pos_bias,
         # use_abs_pos_emb=args.abs_pos_emb,
