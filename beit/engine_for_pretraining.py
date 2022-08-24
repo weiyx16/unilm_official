@@ -15,6 +15,7 @@ from typing import Iterable
 
 import torch
 import torch.nn as nn
+import pprint
 
 import utils
 
@@ -58,8 +59,9 @@ def train_one_epoch(model: torch.nn.Module, d_vae: torch.nn.Module,
         loss_value = loss.item()
 
         if not math.isfinite(loss_value):
-            print("Loss is {}, stopping training".format(loss_value))
-            sys.exit(1)
+            pprint.pprint("Loss is Nan, stopping training")
+            # sys.exit(1)
+            continue
 
         optimizer.zero_grad()
         # this attribute is added by timm on one optimizer (adahessian)
