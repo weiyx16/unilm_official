@@ -17,6 +17,7 @@ import torch
 
 from timm.data import Mixup
 from timm.utils import accuracy, ModelEma
+import pprint
 
 import utils
 
@@ -82,8 +83,9 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         loss_value = loss.item()
 
         if not math.isfinite(loss_value):
-            print("Loss is {}, stopping training".format(loss_value))
-            sys.exit(1)
+            pprint.pprint("Loss is Nan, stopping training")
+            # sys.exit(1)
+            continue
 
         if loss_scaler is None:
             loss /= update_freq
