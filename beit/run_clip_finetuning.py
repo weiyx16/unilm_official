@@ -231,15 +231,16 @@ def main(args, ds_init):
 
     print(args)
 
-    wandb.login(key='c26712d8885e3e6742ffd9c311e10870a46a197f')
-    run = wandb.init(
-        id=args.tag,
-        name=args.tag,
-        entity='msravcg',
-        project='simmim_cond',
-        job_type='finetune',
-        config=args,
-    )
+    if dist.get_rank() == 0:
+        wandb.login(key='c26712d8885e3e6742ffd9c311e10870a46a197f')
+        run = wandb.init(
+            id=args.tag,
+            name=args.tag,
+            entity='msravcg',
+            project='simmim_cond',
+            job_type='finetune',
+            config=args,
+        )
 
     device = torch.device(args.device)
 
@@ -320,7 +321,7 @@ def main(args, ds_init):
         # init_scale=args.init_scale,
         # use_rel_pos_bias=args.rel_pos_bias,
         # use_abs_pos_emb=args.abs_pos_emb,
-        init_values=args.layer_scale_init_value,
+        init_values=None if args.layer_scale_init_value == 0.0 else args.layer_scale_init_value,
     )
 
     patch_size = (model.patch_size, model.patch_size) # model.patch_embed.patch_size
