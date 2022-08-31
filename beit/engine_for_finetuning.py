@@ -85,7 +85,6 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         if not math.isfinite(loss_value):
             pprint.pprint("Loss is Nan, stopping training")
             # sys.exit(1)
-            continue
 
         if loss_scaler is None:
             loss /= update_freq
