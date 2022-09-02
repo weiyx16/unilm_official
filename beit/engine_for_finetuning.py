@@ -53,6 +53,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         optimizer.zero_grad()
 
     for data_iter_step, (samples, targets) in enumerate(metric_logger.log_every(data_loader, print_freq, header)):
+        print(f" Begin Epoch {epoch} Iter {data_iter_step}")
         step = data_iter_step // update_freq
         if step >= num_training_steps_per_epoch:
             continue
@@ -70,7 +71,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
         if mixup_fn is not None:
             samples, targets = mixup_fn(samples, targets)
-
+        print(f" Data Done Epoch {epoch} Iter {data_iter_step}")
         if loss_scaler is None:
             samples = samples.half()
             loss, output = train_class_batch(
@@ -80,6 +81,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
                 loss, output = train_class_batch(
                     model, samples, targets, criterion)
 
+        print(f" Forward Done Epoch {epoch} Iter {data_iter_step}")
         loss_value = loss.item()
 
         if not math.isfinite(loss_value):
@@ -111,7 +113,9 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
                     model_ema.update(model)
             loss_scale_value = loss_scaler.state_dict()["scale"]
 
+        print(f" Backward Done Epoch {epoch} Iter {data_iter_step}")
         torch.cuda.synchronize()
+        print(f" Sync Done Epoch {epoch} Iter {data_iter_step}")
 
         if mixup_fn is None:
             class_acc = (output.max(-1)[-1] == targets).float().mean()
@@ -145,6 +149,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             log_writer.update(grad_norm=grad_norm, head="opt")
 
             log_writer.set_step()
+        print(f" Metric Update Done Epoch {epoch} Iter {data_iter_step}")
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()

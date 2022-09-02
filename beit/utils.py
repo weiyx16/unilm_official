@@ -223,6 +223,15 @@ def setup_for_distributed(is_master):
 
     __builtin__.print = print
 
+def setup_for_distributed_printall(rank):
+    import builtins as __builtin__
+    builtin_print = __builtin__.print
+
+    def print(*args, **kwargs):
+        builtin_print('[RANK:{}]'.format(rank), *args, **kwargs)
+
+    __builtin__.print = print
+
 
 def is_dist_avail_and_initialized():
     if not dist.is_available():
@@ -285,6 +294,7 @@ def init_distributed_mode(args):
                                          world_size=args.world_size, rank=args.rank)
     torch.distributed.barrier()
     # setup_for_distributed(args.rank == 0)
+    setup_for_distributed_printall(args.rank)
 
 
 def load_state_dict(model, state_dict, prefix='', ignore_missing="relative_position_index"):
