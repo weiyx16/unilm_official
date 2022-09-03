@@ -22,6 +22,7 @@ from timm.data import create_transform
 from dall_e.utils import map_pixels
 from masking_generator import MaskingGenerator
 from dataset_folder import ImageFolder
+from cached_image_folder import CachedImageFolder
 
 
 class DataAugmentationForBEiT(object):
@@ -110,6 +111,13 @@ def build_dataset(is_train, args):
     elif args.data_set == 'IMNET':
         root = os.path.join(args.data_path, 'train' if is_train else 'val')
         dataset = datasets.ImageFolder(root, transform=transform)
+        nb_classes = 1000    
+    elif args.data_set == 'IMNET_ZIP':
+        prefix = 'train' if is_train else 'val'
+        ann_file = prefix + "_map.txt"
+        prefix = prefix + ".zip@/"
+        dataset = CachedImageFolder(args.data_path, ann_file, prefix, transform,
+                                    cache_mode='part')
         nb_classes = 1000
     elif args.data_set == "image_folder":
         root = args.data_path if is_train else args.eval_data_path
