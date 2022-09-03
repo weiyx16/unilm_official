@@ -258,6 +258,8 @@ def main(args, ds_init):
     else:
         dataset_val, _ = build_dataset(is_train=False, args=args)
 
+    num_tasks = utils.get_world_size()
+    global_rank = utils.get_rank()
     if args.data_set == 'IMNET_ZIP':
         indices = np.arange(dist.get_rank(), len(dataset_train), dist.get_world_size())
         sampler_train = utils.SubsetRandomSampler(indices)
@@ -265,8 +267,6 @@ def main(args, ds_init):
         sampler_val = utils.SubsetRandomSampler(indices)
     else:
         if True:  # args.distributed:
-            num_tasks = utils.get_world_size()
-            global_rank = utils.get_rank()
             sampler_train = torch.utils.data.DistributedSampler(
                 dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True
             )
